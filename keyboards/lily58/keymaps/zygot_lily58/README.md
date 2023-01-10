@@ -1,13 +1,10 @@
 # Lily58
 
 ```shell
-qmk compile -kb lily58/rev1 -km muppetjones
+qmk compile -kb lily58/rev1 -km zygot_lily58
 ```
 
-```
-qmk flash -kb lily58/rev1 -km muppetjones -bl avrdude-split-left
+```shell
+sudo qmk flash -kb lily58/rev1 -km zygot_lily58
 ```
 
-```
-qmk flash -kb lily58/rev1 -km muppetjones -bl avrdude-split-right
-```
