@@ -27,6 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define OLED_TIMEOUT 60000
 #endif
 
+// Sync halves
+#define SPLIT_LED_STATE_ENABLE
+#define SPLIT_WPM_ENABLE
 
 // Change "hold" time (default is 200 ms)
 #define TAPPING_TERM 200

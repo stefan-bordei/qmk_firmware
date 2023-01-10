@@ -133,27 +133,15 @@ void set_keylog(uint16_t keycode, keyrecord_t *record);
 const char *read_keylog(void);
 const char *read_keylogs(void);
 
-// const char *read_mode_icon(bool swap);
-// const char *read_host_led_state(void);
-// void set_timelog(void);
-// const char *read_timelog(void);
-
 bool oled_task_user(void) {
+  uint8_t current_wpm = get_current_wpm();
   if (is_keyboard_master()) {
-    // If you want to change the display of OLED, you need to change here
-    //oled_write_ln(read_layer_state(), false);
-    //oled_write_ln(read_keylog(), false);
-    //oled_write_ln(read_keylogs(), false);
-    //oled_write_ln(read_mode_icon(keymap_config.swap_lalt_lgui), false);
-    //oled_write_ln(read_host_led_state(), false);
-    //oled_write_ln(read_timelog(), false);
     oled_set_cursor(0,1);
-    uint8_t n = get_current_wpm();
     char    wpm_counter[4];
     wpm_counter[3] = '\0';
-    wpm_counter[2] = '0' + n % 10;
-    wpm_counter[1] = (n /= 10) % 10 ? '0' + (n) % 10 : (n / 10) % 10 ? '0' : ' ';
-    wpm_counter[0] = n / 10 ? '0' + n / 10 : ' ';
+    wpm_counter[2] = '0' + current_wpm % 10;
+    wpm_counter[1] = (current_wpm /= 10) % 10 ? '0' + (current_wpm) % 10 : (current_wpm / 10) % 10 ? '0' : ' ';
+    wpm_counter[0] = current_wpm / 10 ? '0' + current_wpm / 10 : ' ';
     oled_write_P(PSTR("WPM: "), false);
     oled_write(wpm_counter, false);
     oled_set_cursor(0,3); {
@@ -162,9 +150,6 @@ bool oled_task_user(void) {
   } else {
     //oled_write(read_logo(), false);
     render_bongo_cat();
-    //oled_set_cursor(0, 6);
-    //oled_write_P(PSTR("WPM:  "), false);
-    //oled_write(get_u8_str(get_current_wpm(), ' '), false);
   }
     return false;
 }

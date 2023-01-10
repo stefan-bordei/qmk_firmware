@@ -93,44 +93,43 @@ static const char PROGMEM ANIM_TAP[TAP_FRAMES][ANIM_SIZE] = {
 /* Functions */
 
 
-void animation_phase(uint8_t wpm) {
+void animation_phase(void) {
     // NOTE: Optimized the conditional. We don't need to recheck each.
     // NOTE: Move this and the animation outside of the function.
 
-    if (IDLE_SPEED >= wpm) {
+    if (get_current_wpm() <= IDLE_SPEED) {
         current_idle_frame = (current_idle_frame + 1) % IDLE_FRAMES;
         oled_write_raw_P(ANIM_IDLE[abs((IDLE_FRAMES - 1) - current_idle_frame)], ANIM_SIZE);
-    } else if (TAP_SPEED > wpm) {
-        oled_write_raw_P(ANIM_PREP[0], ANIM_SIZE);
-    } else {
+    }
+    if (get_current_wpm() > IDLE_SPEED && get_current_wpm() < TAP_SPEED) {
+        // oled_write_raw_P(prep[abs((PREP_FRAMES-1)-current_prep_frame)], ANIM_SIZE); // uncomment if IDLE_FRAMES >1
+        oled_write_raw_P(ANIM_PREP[0], ANIM_SIZE);  // remove if IDLE_FRAMES >1
+    }
+    if (get_current_wpm() >= TAP_SPEED) {
         current_tap_frame = (current_tap_frame + 1) % TAP_FRAMES;
         oled_write_raw_P(ANIM_TAP[abs((TAP_FRAMES - 1) - current_tap_frame)], ANIM_SIZE);
     }
+
 }
 
 // Images credit j-inc(/James Incandenza) and pixelbenny. Credit to obosob for initial animation approach.
 void render_bongo_cat(void) {
-    uint8_t n = get_current_wpm();
-    //char    wpm_counter[4];
-    //wpm_counter[3] = '\0';
-    //wpm_counter[2] = '0' + n % 10;
-    //wpm_counter[1] = (n /= 10) % 10 ? '0' + (n) % 10 : (n / 10) % 10 ? '0' : ' ';
-    //wpm_counter[0] = n / 10 ? '0' + n / 10 : ' ';
-
-
-    //OLD
-    if (n > 0) {
-        oled_on();
-        anim_timer = timer_read32();
+    if (get_current_wpm() != 000) {
+        oled_on();  // not essential but turns on animation OLED with any alpha keypress
+        if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
+            anim_timer = timer_read32();
+            animation_phase();
+        }
         anim_sleep = timer_read32();
-    } else if (timer_elapsed32(anim_sleep) > OLED_TIMEOUT) {
-        //oled_off();
-        return;
-    }
-
-    if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
-        anim_timer = timer_read32();
-        animation_phase(n);
+    } else {
+        if (timer_elapsed32(anim_sleep) > OLED_TIMEOUT) {
+            //oled_off(); // not neded as OLED goes to sleep by default
+        } else {
+            if (timer_elapsed32(anim_timer) > ANIM_FRAME_DURATION) {
+                anim_timer = timer_read32();
+                animation_phase();
+            }
+        }
     }
 }
 
